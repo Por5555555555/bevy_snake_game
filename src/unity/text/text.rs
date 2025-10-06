@@ -55,6 +55,14 @@ impl<'a> TextOut<'a> {
         self
     }
 
+    pub fn set_no_shadow(mut self) -> Self {
+        self.text_shadow = TextShadow {
+            offset: Vec2 { x: 0., y: 0. },
+            color: self.text_shadow.color,
+        };
+        self
+    }
+
     pub fn set_shadow_color(mut self, color: Srgba) -> Self {
         self.text_shadow = TextShadow {
             offset: self.text_shadow.offset,

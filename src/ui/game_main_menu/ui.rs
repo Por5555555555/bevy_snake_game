@@ -124,6 +124,7 @@ fn add_config_button(text: &str, game_create_enum_data: GameCreateEnumData) -> i
             (
                 ButtonAddOn::init()
                     .node(AddOnNode::init().mode_button().set_width(65).set_height(50))
+                    .set_bg_color(DARK_GRAY)
                     .out(),
                 CreateAddData::D5,
                 game_create_enum_data,
@@ -133,6 +134,7 @@ fn add_config_button(text: &str, game_create_enum_data: GameCreateEnumData) -> i
             (
                 ButtonAddOn::init()
                     .node(AddOnNode::init().mode_button().set_width(65).set_height(50))
+                    .set_bg_color(DARK_GRAY)
                     .out(),
                 CreateAddData::D1,
                 game_create_enum_data,
@@ -143,6 +145,7 @@ fn add_config_button(text: &str, game_create_enum_data: GameCreateEnumData) -> i
             (
                 ButtonAddOn::init()
                     .node(AddOnNode::init().mode_button().set_width(65).set_height(50))
+                    .set_bg_color(DARK_GRAY)
                     .out(),
                 CreateAddData::P5,
                 game_create_enum_data,
@@ -152,6 +155,7 @@ fn add_config_button(text: &str, game_create_enum_data: GameCreateEnumData) -> i
             (
                 ButtonAddOn::init()
                     .node(AddOnNode::init().mode_button().set_width(65).set_height(50))
+                    .set_bg_color(DARK_GRAY)
                     .out(),
                 CreateAddData::P1,
                 game_create_enum_data,

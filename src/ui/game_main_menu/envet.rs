@@ -1,4 +1,4 @@
-use crate::unity::cooldown_time::*;
+use crate::unity::{button_add::ButtonStyle, cooldown_time::*};
 use bevy::prelude::*;
 
 use crate::ui::{
@@ -35,7 +35,6 @@ pub fn new_game(
     game_status.set(GameStatus::NewGame);
 }
 
-// i know this code not the bestter but i dont have idea
 pub fn update_create_data(
     mut game_create_data: ResMut<GameCreate>,
     interaction_query: Query<(
@@ -45,13 +44,16 @@ pub fn update_create_data(
         &mut Cooldown,
         Option<&ActiveCooldown>,
         Entity,
+        &mut BackgroundColor,
     )>,
     text_box_query: Query<(&TextBox, &GameCreateEnumData, &Children)>,
     mut text_query: Query<&mut Text>,
     mut commands: Commands,
 ) {
     info!("{:#?}", text_box_query);
-    for (inter, game_enum, add_data, mut cooldown, active, entity) in interaction_query {
+    for (inter, game_enum, add_data, mut cooldown, active, entity, mut color) in interaction_query {
+        ButtonStyle::init().add_event(*inter, color);
+
         match *inter {
             Interaction::Pressed => {
                 if !active.is_none() {
