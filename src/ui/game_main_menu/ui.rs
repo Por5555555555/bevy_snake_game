@@ -1,8 +1,11 @@
 use bevy::{color::palettes::css::*, prelude::*};
 
-use crate::ui::game_main_menu::{
-    GameStatus,
-    bord_game::{CreateAddData, GameCreateEnumData, MAX_APPLE, MIN_APPLE, MIN_TABLE, TextBox},
+use crate::{
+    ui::game_main_menu::{
+        GameStatus,
+        bord_game::{CreateAddData, GameCreateEnumData, MIN_APPLE, MIN_TABLE, TextBox},
+    },
+    unity::{button_add::ButtonAddOn, node_add::addon_node::AddOnNode, text::TextOut},
 };
 
 use crate::unity::cooldown_time::*;
@@ -31,20 +34,20 @@ pub fn new_game_menu(mut commands: Commands) {
         ..default()
     };
 
-    let head_box_chose_node = Node {
-        width: percent(100.),
-        height: px(50.),
-        flex_direction: FlexDirection::Row,
-        align_items: AlignItems::Center,
-        justify_content: JustifyContent::Center,
-        margin: UiRect {
-            left: px(0),
-            right: px(0),
-            top: px(5),
-            bottom: px(5),
-        },
-        ..default()
-    };
+    // let head_box_chose_node = Node {
+    //     width: percent(100.),
+    //     height: px(50.),
+    //     flex_direction: FlexDirection::Row,
+    //     align_items: AlignItems::Center,
+    //     justify_content: JustifyContent::Center,
+    //     margin: UiRect {
+    //         left: px(0),
+    //         right: px(0),
+    //         top: px(5),
+    //         bottom: px(5),
+    //     },
+    //     ..default()
+    // };
 
     let box_start_game = Node {
         width: px(200.),
@@ -61,7 +64,6 @@ pub fn new_game_menu(mut commands: Commands) {
         ..default()
     };
 
-    //commands.spawn(Camera2d);
     commands.spawn((
         DespawnOnExit(GameStatus::NewGame),
         main_node,
@@ -77,63 +79,8 @@ pub fn new_game_menu(mut commands: Commands) {
                         ..default()
                     }
                 ),
-                (
-                    head_box_chose_node.clone(),
-                    BackgroundColor(GREEN.into()),
-                    children![
-                        (Text::new("Max Table : ")),
-                        add_button(
-                            "-5".to_string(),
-                            CreateAddData::D5,
-                            GameCreateEnumData::TableData,
-                        ),
-                        add_button(
-                            "-1".to_string(),
-                            CreateAddData::D1,
-                            GameCreateEnumData::TableData,
-                        ),
-                        (add_box_data(GameCreateEnumData::TableData)),
-                        add_button(
-                            "+5".to_string(),
-                            CreateAddData::P5,
-                            GameCreateEnumData::TableData,
-                        ),
-                        add_button(
-                            "+1".to_string(),
-                            CreateAddData::P1,
-                            GameCreateEnumData::TableData,
-                        ),
-                        (Button),
-                    ]
-                ),
-                (
-                    head_box_chose_node.clone(),
-                    BackgroundColor(GREEN.into()),
-                    children![
-                        (Text::new("Max Apple : ")),
-                        add_button(
-                            "-5".to_string(),
-                            CreateAddData::D5,
-                            GameCreateEnumData::AppleData,
-                        ),
-                        add_button(
-                            "-1".to_string(),
-                            CreateAddData::D1,
-                            GameCreateEnumData::AppleData,
-                        ),
-                        (add_box_data(GameCreateEnumData::AppleData)),
-                        add_button(
-                            "+5".to_string(),
-                            CreateAddData::P5,
-                            GameCreateEnumData::AppleData,
-                        ),
-                        add_button(
-                            "+1".to_string(),
-                            CreateAddData::P1,
-                            GameCreateEnumData::AppleData,
-                        ),
-                    ]
-                ),
+                add_config_button("Max Table ", GameCreateEnumData::TableData),
+                add_config_button("Max Apple ", GameCreateEnumData::AppleData),
                 (
                     BackgroundColor(WHITE.into()),
                     box_start_game,
@@ -147,10 +94,72 @@ pub fn new_game_menu(mut commands: Commands) {
                             ..default()
                         }
                     )]
-                )
+                ),
             ],
         )],
     ));
+}
+
+fn add_config_button(text: &str, game_create_enum_data: GameCreateEnumData) -> impl Bundle {
+    let head_box_chose_node = Node {
+        width: percent(100.),
+        height: px(50.),
+        flex_direction: FlexDirection::Row,
+        align_items: AlignItems::Center,
+        justify_content: JustifyContent::Center,
+        margin: UiRect {
+            left: px(0),
+            right: px(0),
+            top: px(5),
+            bottom: px(5),
+        },
+        ..default()
+    };
+
+    (
+        head_box_chose_node.clone(),
+        BackgroundColor(GREEN.into()),
+        children![
+            (TextOut::init(text).size(18.).out()),
+            (
+                ButtonAddOn::init()
+                    .node(AddOnNode::init().mode_button().set_width(65).set_height(50))
+                    .out(),
+                CreateAddData::D5,
+                game_create_enum_data,
+                Cooldown(add_time_onec(0.1)),
+                children![(TextOut::init("-5").out())]
+            ),
+            (
+                ButtonAddOn::init()
+                    .node(AddOnNode::init().mode_button().set_width(65).set_height(50))
+                    .out(),
+                CreateAddData::D1,
+                game_create_enum_data,
+                Cooldown(add_time_onec(0.1)),
+                children![(TextOut::init("-1").out())]
+            ),
+            (add_box_data(game_create_enum_data)),
+            (
+                ButtonAddOn::init()
+                    .node(AddOnNode::init().mode_button().set_width(65).set_height(50))
+                    .out(),
+                CreateAddData::P5,
+                game_create_enum_data,
+                Cooldown(add_time_onec(0.1)),
+                children![(TextOut::init("+5").out())]
+            ),
+            (
+                ButtonAddOn::init()
+                    .node(AddOnNode::init().mode_button().set_width(65).set_height(50))
+                    .out(),
+                CreateAddData::P1,
+                game_create_enum_data,
+                Cooldown(add_time_onec(0.1)),
+                children![(TextOut::init("+1").out())]
+            ),
+        ],
+    )
 }
 
 fn box_save_data() -> Node {
@@ -185,35 +194,35 @@ fn add_box_data(game_create_enum_data: GameCreateEnumData) -> impl Bundle {
     )
 }
 
-fn button_chose_node() -> Node {
-    Node {
-        width: px(50.),
-        height: px(50.),
-        align_items: AlignItems::Center,
-        justify_content: JustifyContent::Center,
-        margin: UiRect {
-            left: px(5),
-            right: px(5),
-            top: px(0),
-            bottom: px(0),
-        },
-        ..default()
-    }
-}
-
-fn add_button(
-    text: String,
-    create_add_data: CreateAddData,
-    game_create_enum_data: GameCreateEnumData,
-) -> impl Bundle {
-    (
-        Button,
-        button_chose_node(),
-        BackgroundColor(DARK_BLUE.into()),
-        BorderRadius::all(px(10)),
-        children![Text::new(text)],
-        game_create_enum_data,
-        create_add_data,
-        Cooldown(add_time_onec(0.25)),
-    )
-}
+// fn button_chose_node() -> Node {
+//     Node {
+//         width: px(50.),
+//         height: px(50.),
+//         align_items: AlignItems::Center,
+//         justify_content: JustifyContent::Center,
+//         margin: UiRect {
+//             left: px(5),
+//             right: px(5),
+//             top: px(0),
+//             bottom: px(0),
+//         },
+//         ..default()
+//     }
+// }
+//
+// fn add_button(
+//     text: String,
+//     create_add_data: CreateAddData,
+//     game_create_enum_data: GameCreateEnumData,
+// ) -> impl Bundle {
+//     (
+//         Button,
+//         button_chose_node(),
+//         BackgroundColor(DARK_BLUE.into()),
+//         BorderRadius::all(px(10)),
+//         children![Text::new(text)],
+//         game_create_enum_data,
+//         create_add_data,
+//         Cooldown(add_time_onec(0.25)),
+//     )
+// }

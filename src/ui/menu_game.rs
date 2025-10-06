@@ -1,6 +1,10 @@
 use bevy::{color::palettes::css::*, prelude::*};
 
-use crate::unity::cooldown_time::{ActiveCooldown, Cooldown};
+use crate::unity::{
+    button_add::{ButtonStyle, button_add::ButtonAddOn},
+    node_add::addon_node::AddOnNode,
+    text::TextOut,
+};
 
 #[derive(Component, Default, Clone, Copy, PartialEq, Eq, Hash, States, Debug)]
 pub enum GameMenu {
@@ -15,19 +19,15 @@ pub struct GameMenuStruct;
 impl Plugin for GameMenuStruct {
     fn build(&self, app: &mut App) {
         app.init_state::<GameMenu>();
+        app.add_systems(Startup, |mut c: Commands| {
+            c.spawn(Camera2d);
+        });
         app.add_systems(Startup, app_menu);
         app.add_systems(Update, (button_system, go_back_to_menu));
     }
 }
 
 fn app_menu(mut commands: Commands) {
-    commands.spawn(Camera2d);
-    commands.spawn(game_menu());
-}
-
-fn game_menu() -> impl Bundle {
-    info!("init new menu");
-
     let main_node = Node {
         width: percent(100),
         height: percent(100),
@@ -36,7 +36,7 @@ fn game_menu() -> impl Bundle {
         ..default()
     };
 
-    let hand_node = Node {
+    let head_node = Node {
         width: px(500),
         height: px(500),
         justify_content: JustifyContent::Center,
@@ -45,70 +45,40 @@ fn game_menu() -> impl Bundle {
         ..default()
     };
 
-    let button_node = Node {
-        width: px(165),
-        height: px(50),
-        justify_content: JustifyContent::Center,
-        align_items: AlignItems::Center,
-        margin: UiRect::all(px(10)),
-        border: UiRect::all(px(5)),
-        ..default()
-    };
-
-    (
+    commands.spawn((
         main_node,
-        //BackgroundColor(DARK_GRAY.into()),
         DespawnOnExit(GameMenu::MenuMain),
         children![(
-            hand_node,
+            head_node,
             BackgroundColor(DARK_BLUE.into()),
             children![
                 (
-                    Text::new("Game snake"),
-                    TextFont {
-                        font_size: 44.,
-                        ..default()
-                    },
+                    TextOut::init("Game snake").set_color(WHITE).size(44.).out(),
                     Node {
                         margin: UiRect::all(px(50)),
                         ..default()
                     }
                 ),
                 (
-                    Button,
-                    button_node.clone(),
-                    BackgroundColor(DARK_GRAY.into()),
-                    BorderRadius::MAX,
-                    BorderColor::all(Color::BLACK),
+                    ButtonAddOn::init()
+                        .set_bg_color(DARK_BLUE)
+                        .node(AddOnNode::init().mode_button())
+                        .out(),
                     GameMenu::Game,
-                    children![(
-                        Text::new("Play"),
-                        TextFont {
-                            font_size: 33.,
-                            ..default()
-                        },
-                        TextShadow::default()
-                    )]
+                    children![(TextOut::init("Play").out())]
                 ),
                 (
-                    Button,
-                    button_node,
-                    BackgroundColor(DARK_GRAY.into()),
-                    BorderRadius::MAX,
-                    BorderColor::all(Color::BLACK),
+                    ButtonAddOn::init()
+                        .set_bg_color(DARK_BLUE)
+                        .node(AddOnNode::init().mode_button())
+                        .out(),
                     GameMenu::Quit,
-                    children![(
-                        Text::new("Quit"),
-                        TextFont {
-                            font_size: 33.,
-                            ..default()
-                        },
-                        TextShadow::default()
-                    )]
+                    children![(TextOut::init("Quit").out())]
                 )
-            ]
+            ],
         )],
-    )
+    ));
+    //commands.spawn(game_menu());
 }
 
 pub fn button_system(
@@ -117,6 +87,8 @@ pub fn button_system(
     mut commands: Commands,
 ) {
     for (interaction, button_status, mut color) in interaction_query {
+        ButtonStyle::init().add_event(*interaction, color);
+
         match *interaction {
             Interaction::Pressed => {
                 match *button_status {
@@ -131,12 +103,7 @@ pub fn button_system(
                     _ => {}
                 };
             }
-            Interaction::Hovered => {
-                *color = GREEN.into();
-            }
-            Interaction::None => {
-                *color = DARK_GRAY.into();
-            }
+            _ => {}
         }
     }
 }
@@ -145,7 +112,7 @@ pub fn go_back_to_menu(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut game_menu_data: ResMut<NextState<GameMenu>>,
     game_menu_read: Res<State<GameMenu>>,
-    mut commands: Commands,
+    commands: Commands,
 ) {
     if *game_menu_read.get() == GameMenu::MenuMain {
         return;
@@ -154,6 +121,6 @@ pub fn go_back_to_menu(
     if keyboard_input.pressed(KeyCode::Escape) {
         game_menu_data.set(GameMenu::Game);
         game_menu_data.set(GameMenu::MenuMain);
-        commands.spawn(game_menu());
+        app_menu(commands);
     }
 }

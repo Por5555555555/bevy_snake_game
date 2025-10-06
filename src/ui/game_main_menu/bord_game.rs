@@ -16,8 +16,6 @@ pub struct GameCreate {
     tabel: i32,
     #[getset(get = "pub", set = "pub")]
     apple: i32,
-    #[getset(get = "pub", set = "pub")]
-    cooldown: f32,
 }
 
 impl Default for GameCreate {
@@ -25,7 +23,6 @@ impl Default for GameCreate {
         Self {
             tabel: MIN_TABLE,
             apple: MIN_APPLE,
-            cooldown: 1.,
         }
     }
 }

@@ -1,6 +1,5 @@
 use crate::unity::cooldown_time::*;
-use bevy::{ecs::error::info, platform::thread, prelude::*};
-use std::time::Duration;
+use bevy::prelude::*;
 
 use crate::ui::{
     GameMenu,
@@ -51,7 +50,7 @@ pub fn update_create_data(
     mut text_query: Query<&mut Text>,
     mut commands: Commands,
 ) {
-    //info!("{:#?}", text_box_query);
+    info!("{:#?}", text_box_query);
     for (inter, game_enum, add_data, mut cooldown, active, entity) in interaction_query {
         match *inter {
             Interaction::Pressed => {
